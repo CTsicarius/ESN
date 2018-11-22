@@ -48,4 +48,4 @@ gg <- ggplot(data=df,
 plot(gg)
 
 #FOR SAVE
-ggsave('sqrtbeta10.pdf',plot = gg, device = 'pdf')
+ggsave('sqrtbeta1.pdf',plot = gg, device = 'pdf')

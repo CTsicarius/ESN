@@ -106,7 +106,7 @@ generate_varn = function(T0, PHI, sigma, initial_condition = 'random_gaussian'){
 #' @export
 #'
 #' @examples
-estimate_varn_parameters = function(n, data, regularization = 0.01, tol = 1e-10){
+estimate_varn_parameters = function(n, data, reg = 0.01, tol = 1e-10){
   T0 = ncol(data)
   input = rbind(1, data[, n:(T0 - 1), drop = FALSE])
   for(i in 1:(n - 1)){

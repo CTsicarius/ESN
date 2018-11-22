@@ -107,7 +107,7 @@ make_esn_predictions <- function(u, W, Win, x = NULL, alpha, Wout){
     x <- calculate_x(u, W, Win, alpha)
   } 
   T0 <- ncol(u)
-  return(Wout %*% rbind(1, u, x))
+  return(Wout %*% rbind(1, u, x)) 
 }
 
 
