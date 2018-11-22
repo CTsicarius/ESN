@@ -75,6 +75,51 @@ Rcpp::cppFunction("arma::mat calculate_xc_fb(arma::mat u, arma::mat W, arma::mat
             }", depends='RcppArmadillo')
 
 
+Rcpp::cppFunction("arma::mat calculate_x_fb(arma::mat u, arma::mat W, arma::mat Win, arma::mat Wfb, arma::mat y, double alpha, bool bias = true) {
+             if(bias){ 
+                  int Nx = Win.n_rows;
+                  int T0 = u.n_cols;
+                  arma::mat x = arma::zeros(Nx, T0);
+                  arma::mat x_bar = arma::tanh(Win*arma::join_cols(arma::ones(1, 1), u.col(0)));
+                  x.col(0) = alpha*x_bar;
+                  for(int i = 1; i < T0; ++i){
+                  x_bar = arma::tanh(Win*arma::join_cols(arma::ones(1, 1), u.col(i)) + W*x.col(i - 1) + Wfb*y.col(i - 1));
+                  x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
+                  }
+                  return(x);
+                  }
+              else{
+                  int Nx = Win.n_rows;
+                  int T0 = u.n_cols;
+                  arma::mat x = arma::zeros(Nx, T0);
+                  arma::mat x_bar = arma::tanh(Win*u.col(0));
+                  x.col(0) = alpha*x_bar;
+                  for(int i = 1; i < T0; ++i){
+                  x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*y.col(i - 1));
+                  x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
+                  }
+                  return(x);
+                  }
+                  }", depends='RcppArmadillo')
+
+Rcpp::cppFunction("arma::mat calculate_xfb_test(arma::mat u, arma::mat W, arma::mat Win, 
+                  arma::mat Wfb, arma::mat Wout, double alpha, bool bias = true) {
+                  int Nx = Win.n_rows;
+                  int T0 = u.n_cols;
+                  int Ny = Wout.n_rows;
+                  arma::mat x = arma::zeros(Nx, T0);
+                  arma::mat y = arma::zeros(Ny, T0);
+                  arma::mat x_bar = arma::tanh(Win*u.col(0));
+                  x.col(0) = alpha*x_bar;
+                  y.col(0) = Wout * arma::join_cols(join_cols(arma::ones(1, 1), u.col(0)), x.col(0));
+                  for(int i = 1; i < T0; ++i){
+                    x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*y.col(i - 1));
+                    x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
+                    y.col(i) = Wout * arma::join_cols(join_cols(arma::ones(1, 1), u.col(i)), x.col(i));
+                  }
+                  return(arma::join_cols(x, y));
+                  }", depends='RcppArmadillo')            
+
 calculate_x = function(u, W, Win, alpha){
   Nx = nrow(Win)
   T0 = ncol(u)
