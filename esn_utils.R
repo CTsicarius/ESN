@@ -103,21 +103,28 @@ Rcpp::cppFunction("arma::mat calculate_x_fb(arma::mat u, arma::mat W, arma::mat 
                   }", depends='RcppArmadillo')
 
 Rcpp::cppFunction("arma::mat calculate_xfb_test(arma::mat u, arma::mat W, arma::mat Win, 
-                  arma::mat Wfb, arma::mat Wout, double alpha, bool bias = true) {
+                  arma::mat Wfb, arma::mat y, arma::mat Wout, int tf_until, double alpha, bool bias = true) {
                   int Nx = Win.n_rows;
                   int T0 = u.n_cols;
                   int Ny = Wout.n_rows;
                   arma::mat x = arma::zeros(Nx, T0);
-                  arma::mat y = arma::zeros(Ny, T0);
                   arma::mat x_bar = arma::tanh(Win*u.col(0));
                   x.col(0) = alpha*x_bar;
-                  y.col(0) = Wout * arma::join_cols(join_cols(arma::ones(1, 1), u.col(0)), x.col(0));
-                  for(int i = 1; i < T0; ++i){
+                  for(int i = 1; i < tf_until; ++i){
                     x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*y.col(i - 1));
                     x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
-                    y.col(i) = Wout * arma::join_cols(join_cols(arma::ones(1, 1), u.col(i)), x.col(i));
                   }
-                  return(arma::join_cols(x, y));
+
+                  arma::mat res_y = arma::zeros(Ny, T0 - tf_until);
+                  x_bar = arma::tanh(Win*u.col(tf_until) + W*x.col(tf_until - 1) + Wfb*y.col(tf_until - 1));
+                  x.col(tf_until) = (1. - alpha)*x.col(tf_until - 1) + alpha*x_bar;
+                  res_y.col(0) = Wout * arma::join_cols(join_cols(arma::ones(1, 1), u.col(tf_until)), x.col(tf_until));
+                  for(int i = tf_until + 1; i < T0; ++i){
+                    x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*res_y.col(i - 1 - tf_until));
+                    x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
+                    res_y.col(i - tf_until) = Wout * arma::join_cols(join_cols(arma::ones(1, 1), u.col(i)), x.col(i));
+                  }
+                  return(res_y);
                   }", depends='RcppArmadillo')            
 
 calculate_x = function(u, W, Win, alpha){
@@ -142,6 +149,8 @@ train_Wout <- function(y, u, W, Win, x = NULL, alpha, beta){
   Nx <- nrow(x)
   T0 <- ncol(u)
   input <- rbind(1, u, x)
+  print(rankMatrix(input, tol = 1e-20))
+  print(rankMatrix(input %*% t(input), tol = 1e-20))
   Wout <- t(solve(input %*% t(input) + beta*diag(Nx + Nu + 1), input %*% t(y), tol = 1e-60))
   return(Wout)
 }
@@ -153,6 +162,31 @@ make_esn_predictions <- function(u, W, Win, x = NULL, alpha, Wout){
   } 
   T0 <- ncol(u)
   return(Wout %*% rbind(1, u, x)) 
+}
+
+train_multy_enet = function(x, y, lambda, alpha_enet){
+  Ny = ncol(y)
+  Nx = ncol(x)
+  W = matrix(0, Nx + 1, Ny)
+  for(i in 1:Ny){
+    fit = glmnet(x = x, y = y[, i], lambda = lambda, alpha = alpha_enet)
+    W[, i] = as.matrix(coef(fit, s = lambda))
+  }
+  return(W)
+}
+
+
+train_Wout_enet = function(y, u, W, Win, x = NULL, alpha, lambda, alpha_enet) {
+  if(is.null(x)){
+    x <- calculate_x(u, W, Win, alpha)
+  } 
+  Ny <- dim(y)[1]
+  Nu <- dim(u)[1]
+  Nx <- dim(x)[1]
+  T0 <- dim(u)[2]
+  input = rbind(u, x)
+  Wout = t(train_multy_enet(x = t(input), y = t(y), lambda = lambda, alpha_enet = alpha_enet))
+  return(Wout)
 }
 
 

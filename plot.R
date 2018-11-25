@@ -12,6 +12,7 @@ gg = ggplot(data=df, aes(x= C1, y = C2)) + theme_bw() +
 plot(gg)
 ggsave('ex1_output.pdf',plot = gg, device = 'pdf')
 
+#PLOT CON VAR
 from = 1
 library(ggplot2)
 library(reshape)
@@ -48,4 +49,4 @@ gg <- ggplot(data=df,
 plot(gg)
 
 #FOR SAVE
-ggsave('sqrtbeta1.pdf',plot = gg, device = 'pdf')
+ggsave('enet_diff_seed.pdf',plot = gg, device = 'pdf')
