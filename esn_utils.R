@@ -47,7 +47,8 @@ Rcpp::cppFunction("arma::mat calculate_xc(arma::mat u, arma::mat W, arma::mat Wi
             }", depends='RcppArmadillo')
 
 
-Rcpp::cppFunction("arma::mat calculate_xc_fb(arma::mat u, arma::mat W, arma::mat Win, arma::mat Wfb, arma::mat y, double alpha, bool bias = true) {
+Rcpp::cppFunction("arma::mat calculate_xc_fb(arma::mat u, arma::mat W, arma::mat Win, arma::mat Wfb, 
+                                             arma::mat y, double alpha, double nu_noise, bool bias = true) {
             if(bias){ 
               int Nx = Win.n_rows;
               int T0 = u.n_cols;
@@ -67,7 +68,7 @@ Rcpp::cppFunction("arma::mat calculate_xc_fb(arma::mat u, arma::mat W, arma::mat
               arma::mat x_bar = arma::tanh(Win*u.col(0));
               x.col(0) = alpha*x_bar;
               for(int i = 1; i < T0; ++i){
-                x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*(y.col(i - 1) + R::runif(-0.001, 0.001)));
+                x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*(y.col(i - 1) + R::runif(-nu_noise, nu_noise)));
                 x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
               }
               return(x);

@@ -8,3 +8,7 @@ random_101 = function(Nrows, Ncols, prob_array){
   aux[aux > P3] = 1
   return(matrix(aux, Nrows, Ncols))
 }
+
+unif_matrix = function(Nrows, Ncols, min, max){
+  return(matrix(runif(Nrows*Ncols, min, max), Nrows, Ncols))
+}
