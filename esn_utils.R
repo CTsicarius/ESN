@@ -141,7 +141,7 @@ Rcpp::cppFunction("arma::mat calculate_xfb_test_no_input(arma::mat u, arma::mat 
                     x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*y.col(i - 1));
                     x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
                   }
-
+              
                   arma::mat res_y = arma::zeros(Ny, T0 - tf_until);
                   x_bar = arma::tanh(Win*u.col(tf_until) + W*x.col(tf_until - 1) + Wfb*y.col(tf_until - 1));
                   x.col(tf_until) = (1. - alpha)*x.col(tf_until - 1) + alpha*x_bar;
