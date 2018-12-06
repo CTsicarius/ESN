@@ -80,14 +80,41 @@ saveRDS(y_train, 'Data/y_train_multiple_atractor')
 saveRDS(u_test, 'Data/u_test_multiple_atractor')
 saveRDS(y_test, 'Data/y_test_multiple_atractor')  
   
-mackey_glass = function(T0, delta, tau, alpha = 0.2, beta = 10, gamma = 0.1){
-  y = matrix(0, 1, T0)
-  for(i in 1:T0){
-    y[i] = y[i - 1] + delta*( (alpha*y[i - tau/delta])/() )
-  }
+generate_L8 = function(T0 = 50, reps = 1){
+  s_up = 2*seq(1, T0)/T0 - 1
+  s_down = 2*seq(-T0, -1)/T0 + 1
+  y1 = sin(pi/2*s_down)
+  y2 = cos(pi/2*s_up) + 1
+  y2 = rev(y2)
+  y3 = -sin(pi/2*s_up)
+  y3 = rev(y3)
+  y4 = -cos(pi/2*s_up) - 1
+  y4 = rev(y4)
+  x = c(y1, rev(s_up), y3, rev(s_up))
+  y = c(s_down, y2, rev(s_up), y4)
+  x = rep(x, reps)
+  y = rep(y, reps)
+  return(list('x' = x, 'y' = 0.5*y))
 }
 
+T0 = 50
+reps_train = 15
+reps_test = 105
 
+train_L8 = generate_L8(T0 = T0, reps = reps_train)
+data_train = matrix(c(train_L8$x, train_L8$y), 2, 4*T0*reps_train, byrow = TRUE)
+u_train = data_train[, 1:(4*T0*reps_train - 1)]
+y_train = data_train[, 2:(4*T0*reps_train)]
+
+test_L8 = generate_L8(T0 = T0, reps = reps_test)
+data_test = matrix(c(test_L8$x, test_L8$y), 2, 4*T0*reps_test, byrow = TRUE)
+u_test = data_test[, 1:(4*T0*reps_test - 1)]
+y_test = data_test[, 2:(4*T0*reps_test)]
+
+saveRDS(u_train, 'Data/u_train_L8')
+saveRDS(y_train, 'Data/y_train_L8')
+saveRDS(u_test, 'Data/u_test_L8')
+saveRDS(y_test, 'Data/y_test_L8')
 
 
 

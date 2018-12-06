@@ -1,10 +1,10 @@
 seed = 2
 set.seed(seed)
 #LOAD DATA
-u_train = readRDS(file = 'Data/u_train_sinusoidal')
-y_train = readRDS(file = 'Data/y_train_sinusoidal')
-u_test = readRDS(file = 'Data/u_train_sinusoidal')
-y_test = readRDS(file = 'Data/y_train_sinusoidal')
+u_train = readRDS(file = 'Data/u_train_L8')
+y_train = readRDS(file = 'Data/y_train_L8')
+u_test = readRDS(file = 'Data/u_test_L8')
+y_test = readRDS(file = 'Data/y_test_L8')
 
 #APLICAMOS FUNCION NO LINEAL AL OUTPUT
 #y_train = tan(y_train)
@@ -15,15 +15,15 @@ Nu = nrow(u_test)
 Nx = 100
 
 Ny = nrow(y_test)
-T_min = 51
-T_max = 4000
+T_min = 1000
+T_max = 2999
 tf_until = 1000
-N_test = 500
+N_test = 19999
 alpha = 1
 beta = 1e-9
-u_noise = 0.1
+u_noise = 0.01
 
-W = 0.1*random_101(Nx, Nx, c(0.025, 0.95, 0.025))
+W = 0.448*random_101(Nx, Nx, c(0.025, 0.95, 0.025))
 print(max(abs(eigen(W)$values)))
 print(max(svd(W)$d))
 Win = 5*random_101(Nx, Nu, c(0.5, 0, 0.5))

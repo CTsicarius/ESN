@@ -62,6 +62,7 @@ Rcpp::cppFunction("arma::mat calculate_xc_fb(arma::mat u, arma::mat W, arma::mat
               return(x);
             }
             else{
+
               int Nx = Win.n_rows;
               int T0 = u.n_cols;
               arma::mat x = arma::zeros(Nx, T0);
@@ -84,8 +85,8 @@ Rcpp::cppFunction("arma::mat calculate_x_fb(arma::mat u, arma::mat W, arma::mat 
                   arma::mat x_bar = arma::tanh(Win*arma::join_cols(arma::ones(1, 1), u.col(0)));
                   x.col(0) = alpha*x_bar;
                   for(int i = 1; i < T0; ++i){
-                  x_bar = arma::tanh(Win*arma::join_cols(arma::ones(1, 1), u.col(i)) + W*x.col(i - 1) + Wfb*y.col(i - 1));
-                  x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
+                    x_bar = arma::tanh(Win*arma::join_cols(arma::ones(1, 1), u.col(i)) + W*x.col(i - 1) + Wfb*y.col(i - 1));
+                    x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
                   }
                   return(x);
                   }
@@ -95,9 +96,10 @@ Rcpp::cppFunction("arma::mat calculate_x_fb(arma::mat u, arma::mat W, arma::mat 
                   arma::mat x = arma::zeros(Nx, T0);
                   arma::mat x_bar = arma::tanh(Win*u.col(0));
                   x.col(0) = alpha*x_bar;
+                  Rcout << 'a vector is' << std::endl;
                   for(int i = 1; i < T0; ++i){
-                  x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*y.col(i - 1));
-                  x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
+                    x_bar = arma::tanh(Win*u.col(i) + W*x.col(i - 1) + Wfb*y.col(i - 1));
+                    x.col(i) = (1. - alpha)*x.col(i - 1) + alpha*x_bar;
                   }
                   return(x);
                   }

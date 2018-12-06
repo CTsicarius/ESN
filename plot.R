@@ -2,15 +2,17 @@
 library(ggplot2)
 library(reshape)
 library(RColorBrewer)
-row = 1
-x_for_plot = y_train[1, ]
-x_index = c(1:ncol(y_train))
+row = 90
+x_for_plot = x_train[row, 1:100]
+x_index = c(1:100)
 df = data.frame('C1' = x_index, 'C2' = x_for_plot)
 gg = ggplot(data=df, aes(x= C1, y = C2)) + theme_bw() +
             theme(text = element_text(size=14)) + theme(axis.text=element_text(size=rel(1.2))) + 
-            geom_line() + xlab('Index') + ylab('Value')
+            geom_line(color = 'black') + xlab('Index') + ylab('MSE')
+
 plot(gg)
-ggsave('ex1_output.pdf',plot = gg, device = 'pdf')
+
+ggsave('neuron90_sw.pdf',plot = gg, device = 'pdf')
 
 #PLOT CON VAR
 from = 1
@@ -50,3 +52,5 @@ plot(gg)
 
 #FOR SAVE
 ggsave('enet_diff_seed.pdf',plot = gg, device = 'pdf')
+
+
