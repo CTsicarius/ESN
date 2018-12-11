@@ -234,4 +234,23 @@ train_Wout_enet = function(y, u, W, Win, x = NULL, alpha, lambda, alpha_enet) {
   return(Wout)
 }
 
+#####################################
+Rcpp::cppFunction("arma::mat calculate_xf_train(arma::mat u, arma::mat y, arma::mat W_in, arma::mat W,
+                    arma::mat W_fb, double alpha, double s_in, double s, double s_fb, double s_nu, bool bias = true) {
+                    int Nx = W_in.n_rows;
+                    int T0 = u.n_cols;
+                    int Ny = y.n_rows;
+                    W_in = s_in*W_in;
+                    W = s*W;
+                    W_fb = s_fb*W_fb;
+                    arma::mat x = arma::zeros(Nx, T0);
+                    if(bias){
+                      return(join_cols(arma::ones(1, T0), u));
+                    }
+                    x.col(0) = arma::tanh(W_in*u.col(0));
+                    for(int i = 1; i < T0; ++i){
+                      x.col(i) = (1. - alpha)*x.col(i - 1) + arma::tanh(W_in*u.col(i) + W*x.col(i - 1) + W_fb*y.col(i - 1));
+                    }
+                    return(x);
+}", depends='RcppArmadillo')            
 

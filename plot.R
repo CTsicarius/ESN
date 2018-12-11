@@ -53,4 +53,17 @@ plot(gg)
 #FOR SAVE
 ggsave('enet_diff_seed.pdf',plot = gg, device = 'pdf')
 
+df = data.frame()
+gg <- ggplot(aes(x=u_train[1, ], y=y_train[2, ])) + geom_line()
+plot(gg)
+
+
+
+
+
+
+
+
+
+
 

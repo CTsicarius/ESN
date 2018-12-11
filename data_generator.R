@@ -99,7 +99,7 @@ generate_L8 = function(T0 = 50, reps = 1){
 
 T0 = 50
 reps_train = 15
-reps_test = 105
+reps_test = 1000
 
 train_L8 = generate_L8(T0 = T0, reps = reps_train)
 data_train = matrix(c(train_L8$x, train_L8$y), 2, 4*T0*reps_train, byrow = TRUE)
